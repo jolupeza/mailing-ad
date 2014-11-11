@@ -126,13 +126,13 @@ var j = jQuery.noConflict();
           j.post(_root_ + 'admin/newsletters/delete', {
             id: id
           }, function(data) {
-            spin.stop();
+            spinner.stop();
             if (data) {
               j('.content').load(_root_ + 'admin/newsletters/displayAjax');
             }
           });
         } else {
-          spin.stop();
+          spinner.stop();
         }
       });
     });

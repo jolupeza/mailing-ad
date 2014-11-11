@@ -514,6 +514,7 @@ class Campaigns extends MY_Controller
 		$this->load->helper('form');
 		$this->template->add_js('view', 'campaigns/script');
 		$this->template->set('_title', $this->lang->line('cms_general_title_send_campaign'));
+		$this->template->set('_active', 'campaigns');
 		$this->template->set('_token', $this->user->token());
 		$this->template->render('campaigns/sendCampaign');
 	}

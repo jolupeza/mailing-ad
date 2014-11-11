@@ -56,6 +56,7 @@ mb_internal_encoding('UTF-8');
 //echo $base_url; exit;
 
 $base_url = 'http://localhost/mailing-ad';
+//$base_url = 'http://ad-inspector.com/proyectos/web/mailing';
 $upload_dir = '/ad-content/uploads/'; // path from base_url to base of upload folder (with start and final /)
 $current_path = '../ad-content/uploads/'; // relative path from filemanager folder to upload folder (with final /)
 //thumbs folder can't put inside upload folder

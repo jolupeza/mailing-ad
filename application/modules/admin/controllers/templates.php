@@ -115,10 +115,12 @@ class Templates extends MY_Controller
 					$slug = slug($template);
 
 					$dir = set_realpath('./mailing/' . $slug . '/');
+					//echo $dir; exit;
 
 					// Creamos el directorio en caso de no existir
 					if(!is_dir($dir)){
-					    mkdir($dir, 777);
+					    mkdir($dir, 0777);
+					    chmod($dir, 0777);
 					}
 
 					$config['upload_path'] = './mailing/' . $slug;

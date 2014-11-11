@@ -125,10 +125,14 @@ class Newsletters extends MY_Controller
 				$body = strstr($html, '<body');
 				$body = strstr($body, '>', TRUE);
 
-				$head = strstr($html, '<body', TRUE);
+				$tidy = tidy_parse_string($html);
+				$head = $tidy->head();
+
 				$first = strstr($content, '</p>', TRUE);
-				$content = substr_replace($content, '', 0, strlen($first) + 6);
-				$content = $head . $body . '>' . $content . '</body></html>';
+				$content = substr_replace($content, '', 0, strlen($first));
+				//$content = substr_replace($content, '', 0, strlen($first) + 6);
+
+				$index = $head . $body . '>' . $content . '</body></html>';
 
 				// Debemos crear carpeta con nombre y crear archivo html con el contenido
 				$directory = slug($name);
@@ -136,11 +140,13 @@ class Newsletters extends MY_Controller
 
 				// Creamos el directorio en caso de no existir
 				if(!is_dir($dir)){
-				    mkdir($dir,777);
+				    mkdir($dir, 0777);
+				    chmod($dir, 0777);
 				}
 
-				$fp = fopen($dir . '\index.html', 'x');
-				fwrite($fp, $content);
+				$fp = fopen($dir . 'index.html', 'x');
+				//$fp = fopen($dir . '\index.html', 'x');  // Windows
+				fwrite($fp, $index);
 				fclose($fp);
 
 				$data = array(
@@ -247,10 +253,12 @@ class Newsletters extends MY_Controller
 				$body = strstr($html, '<body');
 				$body = strstr($body, '>', TRUE);
 
-				$head = strstr($html, '<body', TRUE);
-				$first = strstr($content, '</p>', TRUE);
-				$content = substr_replace($content, '', 0, strlen($first) + 6);
+				$tidy = tidy_parse_string($html);
+				$head = $tidy->head();
+
 				$content = $head . $body . '>' . $content . '</body></html>';
+
+				//echo $content; exit;
 
 				$slug = $news[0]->slug;
 				$dir = $news[0]->guid_path;
@@ -268,7 +276,8 @@ class Newsletters extends MY_Controller
 					}
 				}
 
-				$fp = fopen($dir . '\index.html', 'w');
+				$fp = fopen($dir . 'index.html', 'w');
+				//$fp = fopen($dir . '\index.html', 'w');
 				fwrite($fp, $content);
 				fclose($fp);
 
