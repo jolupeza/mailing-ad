@@ -115,7 +115,6 @@ class Templates extends MY_Controller
 					$slug = slug($template);
 
 					$dir = set_realpath('./mailing/' . $slug . '/');
-					//echo $dir; exit;
 
 					// Creamos el directorio en caso de no existir
 					if(!is_dir($dir)){

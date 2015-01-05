@@ -82,7 +82,7 @@
 		        								'checked'		=>	$checked
 		        							);
 		        						?>
-		          						<?php echo form_checkbox('status', '1', $checked); ?> <?php echo $this->lang->line('cms_general_label_confirm'); ?>?
+		          						<?php echo form_checkbox('status', '1', $checked); ?> <?php echo $this->lang->line('cms_general_label_active'); ?>?
 		        					</label><!-- end label -->
 		      					</div><!-- end checkbox -->
 		    				</div><!-- end col-sm-6 -->

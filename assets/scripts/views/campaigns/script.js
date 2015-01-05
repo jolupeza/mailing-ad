@@ -196,6 +196,7 @@ var j = jQuery.noConflict();
 
           if (data.length > 0) {
             jAlert('No se pudo entregar el correo a algunos suscriptores.', 'Aviso');
+            console.log(data);
           } else {
             jAlert('Se entregó la campaña satisfactoriamente.', 'Aviso');
           }

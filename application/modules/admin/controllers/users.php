@@ -132,14 +132,14 @@ class Users extends MY_Controller
 				$status = $this->input->post('status');
 				$avatar = $this->input->post('avatar');
 				$data = array(
-					'name'	=>	$name,
-					'email'	=>	$email,
-					'user'	=>	$user,
-					'password'	=>	$password,
-					'role'	=>	$role,
-					'status'	=>	(isset($status) && !empty($status)) ? $status : 0,
-					'avatar'	=> $avatar,
-					'created'	=>	$this->user->id,
+					'name'			=>	$name,
+					'email'			=>	$email,
+					'user'			=>	$user,
+					'password'		=>	$password,
+					'role'			=>	$role,
+					'status'		=>	(isset($status) && !empty($status)) ? $status : 0,
+					'avatar'		=> $avatar,
+					'created'		=>	$this->user->id,
 					'created_at'	=>	date('Y-m-d H:i:s')
 				);
 

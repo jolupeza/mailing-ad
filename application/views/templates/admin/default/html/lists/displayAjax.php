@@ -113,7 +113,8 @@
 					<?php echo ($item->status == 1) ? '<i class="fa fa-check"></i>' : '<i class="fa fa-times"></i>'; ?>
 				<?php endif; ?>
 				</td>
-				<td class="text-center"><?php echo date($this->config->item('cms_date_format'), strtotime($item->created_at)); ?></td>
+				<td class="text-center"><?php echo $item->created_at; ?></td>
+				<!--td class="text-center"><?php //echo date($this->config->item('cms_date_format'), strtotime($item->created_at)); ?></td-->
 			</tr>
 			<?php endforeach; ?>
 		<?php else : ?>

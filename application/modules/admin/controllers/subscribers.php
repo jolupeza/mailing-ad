@@ -34,14 +34,19 @@ class Subscribers extends MY_Controller
 	* @param  $search 		Indicamos si se pasa un parámetro de búsqueda
 	* @param  $offset 		Indicamos desde que registro obtenemos la lista
 	*/
-	public function displayAjax($status = 'all', $sort_by = 'id', $sort_order = 'desc', $list = 'all', $search = 'all',  $offset = 0)
+	public function displayAjax($status = 'all', $sort_by = 'id', $sort_order = 'desc', $list = 'all', $limit = 10, $search = 'all',  $offset = 0)
 	{
-		$limit = 10;
 		$total = 0;
 		$this->load->model('Subscribers_model');
 		$this->load->helper('form');
 
-		$result = $this->Subscribers_model->getAll($status, $limit, $offset, $sort_by, $sort_order, $list, $search);
+		if ($search != 'all') {
+			$like = array('name' => urldecode($search));
+		} else {
+			$like = '';
+		}
+
+		$result = $this->Subscribers_model->getAll($status, $limit, $offset, $sort_by, $sort_order, $list, $like);
 		$subs = $result['data'];
 		$total = $result['num_rows'];
 
@@ -52,10 +57,10 @@ class Subscribers extends MY_Controller
 				// Pagination
 				$this->load->library('pagination');
 				$config = array();
-				$config['base_url'] = site_url('admin/subscribers/displayAjax/' . $status . '/' . $sort_by . '/' . $sort_order . '/' . $list . '/' . $search);
+				$config['base_url'] = site_url('admin/subscribers/displayAjax/' . $status . '/' . $sort_by . '/' . $sort_order . '/' . $list . '/' . $limit . '/' . $search);
 				$config['total_rows'] = $total;
 				$config['per_page'] = $limit;
-				$config['uri_segment'] = 9;
+				$config['uri_segment'] = 10;
 
 				$this->pagination->initialize($config);
 
@@ -77,11 +82,13 @@ class Subscribers extends MY_Controller
 		$this->template->set('_trush', $this->Subscribers_model->countRows(array(2)));
 
 		$this->template->set('_status', $status);
+		$this->template->set('_total', $total);
 		$this->template->set('_sort_by', $sort_by);
 		$this->template->set('_sort_order', $sort_order);
 		$this->template->set('_list', $list);
 		$this->template->set('_limit', $limit);
 		$this->template->set('_search', $search);
+		$this->template->set('_offset', $offset);
 		$this->template->renderAjax('subscribers/displayAjax');
 	}
 
@@ -128,10 +135,10 @@ class Subscribers extends MY_Controller
 			if ($this->form_validation->run() === TRUE) {
 				$name = $this->input->post('name');
 				$email = $this->input->post('email');
-				$company = $this->input->post('company');
-				$address = $this->input->post('address');
+				//$company = $this->input->post('company');
+				//$address = $this->input->post('address');
 				$status = $this->input->post('status');
-				$date_birth = $this->input->post('date_birth');
+				//$date_birth = $this->input->post('date_birth');
 				$lists = $this->input->post('lists');
 
 				$mailgun = self::getMailgun();
@@ -140,13 +147,14 @@ class Subscribers extends MY_Controller
 
 				$validate = $mailgunValidate->get('address/validate', array('address' => $email))->http_response_body;
 
+				/*
 				$vars = array(
 					'company'		=>	$company,
 					'direccion'		=>	$address,
 					'date_birth'	=>	$date_birth
-				);
+				);*/
 
-				$vars = json_encode($vars);
+				//$vars = json_encode($vars);
 
 				if ($validate->is_valid) {
 					if (count($lists) > 0) {
@@ -155,7 +163,7 @@ class Subscribers extends MY_Controller
 							$mailgun->post('lists/' . $row[0]->address . '/members', array(
 								'address'		=>	$email,
 								'name'			=>	$name,
-								'vars'			=>	$vars,
+								//'vars'			=>	$vars,
 								'subscribed'	=>	'yes'
 							));
 						}
@@ -164,11 +172,11 @@ class Subscribers extends MY_Controller
 					$data = array(
 						'name'			=>	$name,
 						'email'			=>	$email,
-						'company'		=>	$company,
-						'address'		=>	$this->input->post('address'),
+						//'company'		=>	$company,
+						//'address'		=>	$this->input->post('address'),
 						'status'		=>	(isset($status) && !empty($status)) ? $status : 0,
 						'active'		=>	1,
-						'date_birth'	=>	$this->input->post('date_birth'),
+						//'date_birth'	=>	$this->input->post('date_birth'),
 						'created'		=>	$this->user->id,
 						'created_at'	=>	date('Y-m-d H:i:s')
 					);
@@ -195,7 +203,7 @@ class Subscribers extends MY_Controller
 						$this->template->set_flash_message(array('error' => $this->lang->line('error_message_general')));
 					}
 				} else {
-					$this->template->set_flash_message(array('error' => $this->lang->line('error_email_valid')));
+					$this->template->add_message(array('error' => $this->lang->line('error_email_valid')));
 				}
 			}
 		}
@@ -271,17 +279,25 @@ class Subscribers extends MY_Controller
 					// Trajamos con archivo subido verificar que sea de tipo txt
 					$txt = fopen($_FILES['source']['tmp_name'], "r");
 
+					$email_error = array();
+					$email_ok = array();
+
 					while(!feof($txt)) {
 						$line = fgets($txt);
 						$cols = explode(',', $line);
 
+						$email = trim($cols[1]);
+						$name = trim($cols[0]);
+
 						// Validamos email tanto para nuevo como para actualizar
-						$validate = $mailgunValidate->get('address/validate', array('address' => trim($cols[1])))->http_response_body;
+						$validate = $mailgunValidate->get("address/validate", array('address' => $email))->http_response_body;
+
 						if (!$validate->is_valid) {
+							$email_error[] = $email;
 							continue;
 						}
 
-						// En caso el email a insertar ya se encuentre regitrado no lo inserta (Verificar que hacer en este caso)
+						// En caso el email a insertar ya se encuentre regitrado no lo inserta (Verificar que hacer en este caso) Verificar la lista de suscripción \
 						if (!$this->email_check($cols[1])) {
 							continue; // Debemos actualizar los datos del suscriptor
 
@@ -384,6 +400,7 @@ class Subscribers extends MY_Controller
 								$this->template->set_flash_message(array('error' => $this->lang->line('error_email_valid')));
 							} */
 						} else {
+							/*
 							$date_birth = str_replace("\r\n", "", $cols[4]);
 
 							$vars = array(
@@ -391,30 +408,30 @@ class Subscribers extends MY_Controller
 								'direccion'		=>	trim($cols[3]),
 								'date_birth'	=>	trim($date_birth)
 							);
-							$vars = json_encode($vars);
+							$vars = json_encode($vars);*/
 
 							if (count($lists) > 0) {
 								foreach ($lists as $list) {
 									$row = $this->Subscribers_model->get('mailing_lists' , 'address', array('id' => $list));
 									$mailgun->post('lists/' . $row[0]->address . '/members', array(
-										'address'		=>	trim($cols[1]),
-										'name'			=>	trim($cols[0]),
-										'vars'			=>	$vars,
+										'address'		=>	$email,
+										'name'			=>	$name,
+										//'vars'			=>	$vars,
 										'subscribed'	=>	'yes'
 									));
 								}
 							}
 
-							$date_birth = new DateTime($date_birth);
+							//$date_birth = new DateTime($date_birth);
 
 							$data = array(
-								'name'			=>	trim($cols[0]),
-								'email'			=>	trim($cols[1]),
-								'company'		=>	trim($cols[2]),
-								'address'		=>	trim($cols[3]),
+								'name'			=>	$name,
+								'email'			=>	$email,
+								//'company'		=>	trim($cols[2]),
+								//'address'		=>	trim($cols[3]),
 								'status'		=>	1,
 								'active'		=>	1,
-								'date_birth'	=>	$date_birth->format('Y-m-d'),
+								//'date_birth'	=>	$date_birth->format('Y-m-d'),
 								'created'		=>	$this->user->id,
 								'created_at'	=>	date('Y-m-d H:i:s')
 							);
@@ -422,6 +439,8 @@ class Subscribers extends MY_Controller
 							$last_id = $this->Subscribers_model->add(NULL, $data);
 
 							if (is_integer($last_id) && $last_id > 0) {
+								$email_ok[]	= $email;
+
 								if (count($lists) > 0) {
 									foreach ($lists as $l) {
 										$data = array(
@@ -435,12 +454,16 @@ class Subscribers extends MY_Controller
 									}
 								}
 							}
-
 						}
 					}
 
-					$this->template->set_flash_message(array('success' => $this->lang->line('cms_general_label_success_add')));
-					redirect('admin/subscribers/display');
+					if ($email_error && count($email_error) > 0) {
+						$this->template->set('errorEmail', $email_error);
+					}
+
+					if ($email_ok && count($email_ok) > 0) {
+						$this->template->add_message(array('success' => $this->lang->line('cms_general_label_success_add')));
+					}
 				}
 			} else {
 				$this->template->add_message(array('error' => $this->lang->line('upload_no_file_selected')));

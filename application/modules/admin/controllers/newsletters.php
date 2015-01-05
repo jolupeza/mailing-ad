@@ -120,8 +120,8 @@ class Newsletters extends MY_Controller
 				$temp_id = $this->input->post('temp_id');
 
 				$template = $this->Newsletters_model->get('templates_email', 'guid', array('id' => $temp_id));
-
 				$html = file_get_contents($template[0]->guid);
+
 				$body = strstr($html, '<body');
 				$body = strstr($body, '>', TRUE);
 
@@ -129,8 +129,8 @@ class Newsletters extends MY_Controller
 				$head = $tidy->head();
 
 				$first = strstr($content, '</p>', TRUE);
+
 				$content = substr_replace($content, '', 0, strlen($first));
-				//$content = substr_replace($content, '', 0, strlen($first) + 6);
 
 				$index = $head . $body . '>' . $content . '</body></html>';
 
@@ -145,7 +145,6 @@ class Newsletters extends MY_Controller
 				}
 
 				$fp = fopen($dir . 'index.html', 'x');
-				//$fp = fopen($dir . '\index.html', 'x');  // Windows
 				fwrite($fp, $index);
 				fclose($fp);
 
@@ -258,8 +257,6 @@ class Newsletters extends MY_Controller
 
 				$content = $head . $body . '>' . $content . '</body></html>';
 
-				//echo $content; exit;
-
 				$slug = $news[0]->slug;
 				$dir = $news[0]->guid_path;
 
@@ -276,8 +273,7 @@ class Newsletters extends MY_Controller
 					}
 				}
 
-				$fp = fopen($dir . 'index.html', 'w');
-				//$fp = fopen($dir . '\index.html', 'w');
+				$fp = fopen($dir . 'index.html', 'w');		// Linux
 				fwrite($fp, $content);
 				fclose($fp);
 
@@ -433,6 +429,11 @@ class Newsletters extends MY_Controller
 		exit;
 	}
 
+	/**
+	* Enviar email de prueba con el boletín actual
+	*
+	* @access public
+	*/
 	public function sendEmail()
 	{
 		$email = $this->input->post('email');
@@ -446,7 +447,7 @@ class Newsletters extends MY_Controller
 		$validate = $mailgunValidate->get('address/validate', array('address' => $email))->http_response_body;
 
 		if ($validate->is_valid) {
-			$hash = $mailgunOptIn->generateHash($this->config->item('mailgun_list'), $this->config->item('mailgun_secret'), $email);
+			//$hash = $mailgunOptIn->generateHash($this->config->item('mailgun_list'), $this->config->item('mailgun_secret'), $email);
 
 			$this->load->model('Newsletters_model');
 			$newsletter = $this->Newsletters_model->get(NULL, 'guid_path', array('id' => $id));
@@ -455,17 +456,10 @@ class Newsletters extends MY_Controller
 			$mailgun->sendMessage($this->config->item('mailgun_domain'), array(
 				'from'		=>	'noreply@adinspector.pe',
 				'to'		=>	$email,
-				'subject'	=>	'Please confirm your subscription to us.',
+				'subject'	=>	'Testing send email.',
 				'html'		=>	$content
 			));
 		}
-
-		/*$this->load->library('email');
-		$this->email->from('AD+Inspector Mailing');
-        $this->email->to($email);
-        $this->email->subject('Test send email');
-        $this->email->message($content);
-        //$this->email->send();*/
         echo TRUE;
         exit;
 	}

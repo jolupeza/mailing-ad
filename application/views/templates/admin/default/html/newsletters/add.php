@@ -95,7 +95,7 @@
 										<h4><?php echo $this->lang->line('cms_general_title_templates'); ?> <span class="oc-panel glyphicon glyphicon-chevron-up"></span></h4>
 									</div>
 									<div class="content-widget">
-										<?php if (isset($_templates) && (count($_templates) > 0)) { ?>
+										<?php if ($_templates && (count($_templates) > 0)) { ?>
 										<ul>
 											<?php foreach ($_templates as $temp) : ?>
 											<li>

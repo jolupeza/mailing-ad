@@ -61,11 +61,11 @@ class Configuration extends MY_Controller
 			}
 		}
 
-		$this->template->set('_blogname', $this->Configuration_model->getRow('blogname'));
-		$this->template->set('_blogdescription', $this->Configuration_model->getRow('blogdescription'));
-		$this->template->set('_admin_email', $this->Configuration_model->getRow('admin_email'));
-		$this->template->set('_date_format', $this->Configuration_model->getRow('date_format'));
-		$this->template->set('_time_format', $this->Configuration_model->getRow('time_format'));
+		$this->template->set('_blogname', $this->Configuration_model->getRow('blogname')->option_value);
+		$this->template->set('_blogdescription', $this->Configuration_model->getRow('blogdescription')->option_value);
+		$this->template->set('_admin_email', $this->Configuration_model->getRow('admin_email')->option_value);
+		$this->template->set('_date_format', $this->Configuration_model->getRow('date_format')->option_value);
+		$this->template->set('_time_format', $this->Configuration_model->getRow('time_format')->option_value);
 
 		$this->template->add_js('view', 'configuration/script');
 		$this->template->set('_title', $this->lang->line('cms_general_label_title_general_settings'));
@@ -129,50 +129,43 @@ class Configuration extends MY_Controller
 			if ($this->form_validation->run() === TRUE) {
 				if ($this->input->post('thumb_width') != $this->config->item('cms_thumbnail_size_w')) {
 					$this->Configuration_model->update(array('option_value' => $this->input->post('thumb_width'), 'modified_at' => date('Y-m-d H:i:s')), 'thumbnail_size_w');
-					$this->config->set_item('cms_thumbnail_size_w', $this->input->post('thumb_width'));
 				}
 
 				if ($this->input->post('thumb_height') != $this->config->item('cms_thumbnail_size_h')) {
 					$this->Configuration_model->update(array('option_value' => $this->input->post('thumb_height'), 'modified_at' => date('Y-m-d H:i:s')), 'thumbnail_size_h');
-					$this->config->set_item('cms_thumbnail_size_h', $this->input->post('thumb_height'));
 				}
 
 				if ($this->input->post('crop') != $this->config->item('cms_thumbnail_crop')) {
 					$this->Configuration_model->update(array('option_value' => $this->input->post('crop'), 'modified_at' => date('Y-m-d H:i:s')), 'thumbnail_crop');
-					$this->config->set_item('cms_thumbnail_crop', $this->input->post('crop'));
 				}
 
 				if ($this->input->post('medio_width') != $this->config->item('cms_medium_size_w')) {
 					$this->Configuration_model->update(array('option_value' => $this->input->post('medio_width'), 'modified_at' => date('Y-m-d H:i:s')), 'medium_size_w');
-					$this->config->set_item('cms_medium_size_w', $this->input->post('medio_width'));
 				}
 
 				if ($this->input->post('medio_height') != $this->config->item('cms_medium_size_h')) {
 					$this->Configuration_model->update(array('option_value' => $this->input->post('medio_height'), 'modified_at' => date('Y-m-d H:i:s')), 'medium_size_h');
-					$this->config->set_item('cms_medium_size_h', $this->input->post('medio_height'));
 				}
 
 				if ($this->input->post('large_width') != $this->config->item('cms_large_size_w')) {
 					$this->Configuration_model->update(array('option_value' => $this->input->post('large_width'), 'modified_at' => date('Y-m-d H:i:s')), 'large_size_w');
-					$this->config->set_item('cms_large_size_w', $this->input->post('large_width'));
 				}
 
 				if ($this->input->post('large_height') != $this->config->item('cms_large_size_h')) {
 					$this->Configuration_model->update(array('option_value' => $this->input->post('large_height'), 'modified_at' => date('Y-m-d H:i:s')), 'large_size_h');
-					$this->config->set_item('cms_large_size_h', $this->input->post('large_height'));
 				}
 
 				$this->template->add_message(array('success' => $this->lang->line('cms_general_label_success_edit')));
 			}
 		}
 
-		$this->template->set('_thumb_s_w', $this->Configuration_model->getRow('thumbnail_size_w'));
-		$this->template->set('_thumb_s_h', $this->Configuration_model->getRow('thumbnail_size_h'));
-		$this->template->set('_thumb_crop', $this->Configuration_model->getRow('thumbnail_crop'));
-		$this->template->set('_med_s_w', $this->Configuration_model->getRow('medium_size_w'));
-		$this->template->set('_med_s_h', $this->Configuration_model->getRow('medium_size_h'));
-		$this->template->set('_larg_s_w', $this->Configuration_model->getRow('large_size_w'));
-		$this->template->set('_larg_s_h', $this->Configuration_model->getRow('large_size_h'));
+		$this->template->set('_thumb_s_w', $this->Configuration_model->getRow('thumbnail_size_w')->option_value);
+		$this->template->set('_thumb_s_h', $this->Configuration_model->getRow('thumbnail_size_h')->option_value);
+		$this->template->set('_thumb_crop', $this->Configuration_model->getRow('thumbnail_crop')->option_value);
+		$this->template->set('_med_s_w', $this->Configuration_model->getRow('medium_size_w')->option_value);
+		$this->template->set('_med_s_h', $this->Configuration_model->getRow('medium_size_h')->option_value);
+		$this->template->set('_larg_s_w', $this->Configuration_model->getRow('large_size_w')->option_value);
+		$this->template->set('_larg_s_h', $this->Configuration_model->getRow('large_size_h')->option_value);
 		$this->template->set('_title', $this->lang->line('cms_general_title_media'));
 		$this->template->set('_active', 'configurations');
 		$this->template->set('_token', $this->user->token());
@@ -191,8 +184,6 @@ class Configuration extends MY_Controller
 
 		$this->load->model('Configuration_model');
 		$this->load->helper('form');
-
-		//echo $this->config->item('mailgun_pubkey'); exit;
 
 		if ($this->input->post('token') == $this->session->userdata('token')) {
 			// Validación
@@ -242,37 +233,32 @@ class Configuration extends MY_Controller
 
 
 				$this->Configuration_model->update(array('option_value' => $this->input->post('sender'), 'modified_at' => date('Y-m-d H:i:s')), 'sender');
-				$this->config->set_item('cms_sender', $this->input->post('sender'));
 
 				$this->Configuration_model->update(array('option_value' => $this->input->post('email_sender'), 'modified_at' => date('Y-m-d H:i:s')), 'email_sender');
-				$this->config->set_item('cms_email_sender', $this->input->post('email_sender'));
 
 				$this->Configuration_model->update(array('option_value' => $this->input->post('email_reply'), 'modified_at' => date('Y-m-d H:i:s')), 'email_reply');
-				$this->config->set_item('cms_email_reply', $this->input->post('email_reply'));
 
 				$this->Configuration_model->update(array('option_value' => $this->input->post('mailgun_key'), 'modified_at' => date('Y-m-d H:i:s')), 'mailgun_key');
-				$this->config->set_item('mailgun_key', $this->input->post('mailgun_key'));
 
 				$this->Configuration_model->update(array('option_value' => $this->input->post('mailgun_pubkey'), 'modified_at' => date('Y-m-d H:i:s')), 'mailgun_pubkey');
-				$this->config->set_item('mailgun_pubkey', $this->input->post('mailgun_pubkey'));
 
 				$this->Configuration_model->update(array('option_value' => $this->input->post('mailgun_domain'), 'modified_at' => date('Y-m-d H:i:s')), 'mailgun_domain');
-				$this->config->set_item('mailgun_domain', $this->input->post('mailgun_domain'));
 
 				$this->Configuration_model->update(array('option_value' => $this->input->post('mailgun_secret'), 'modified_at' => date('Y-m-d H:i:s')), 'mailgun_secret');
-				$this->config->set_item('mailgun_secret', $this->input->post('mailgun_secret'));
 
 				$this->template->add_message(array('success' => $this->lang->line('cms_general_label_success_edit')));
 			}
 		}
 
-		$this->template->set('_sender', $this->Configuration_model->getRow('sender'));
-		$this->template->set('_email_sender', $this->Configuration_model->getRow('email_sender'));
-		$this->template->set('_email_reply', $this->Configuration_model->getRow('email_reply'));
-		$this->template->set('_mailgun_key', $this->config->item('mailgun_key'));
-		$this->template->set('_mailgun_pubkey', $this->config->item('mailgun_pubkey'));
-		$this->template->set('_mailgun_domain', $this->config->item('mailgun_domain'));
-		$this->template->set('_mailgun_secret', $this->config->item('mailgun_secret'));
+		$this->template->set('_sender', $this->Configuration_model->getRow('sender')->option_value);
+		$this->template->set('_email_sender', $this->Configuration_model->getRow('email_sender')->option_value);
+		$this->template->set('_email_reply', $this->Configuration_model->getRow('email_reply')->option_value);
+
+		$this->template->set('_mailgun_key', $this->Configuration_model->getRow('mailgun_key')->option_value);
+		$this->template->set('_mailgun_pubkey', $this->Configuration_model->getRow('mailgun_pubkey')->option_value);
+		$this->template->set('_mailgun_domain', $this->Configuration_model->getRow('mailgun_domain')->option_value);
+		$this->template->set('_mailgun_secret', $this->Configuration_model->getRow('mailgun_secret')->option_value);
+
 		$this->template->set('_title', $this->lang->line('cms_general_title_setting_smtp'));
 		$this->template->set('_active', 'configurations');
 		$this->template->set('_token', $this->user->token());

@@ -161,12 +161,13 @@ class Campaigns extends MY_Controller
 				))->http_response_body;
 
 				if ($result->message == 'Campaign created') {
+					$this->load->model('Configuration_model');
 					$data = array(
 						'name'			=>	$name,
 						'mailgun_id'	=>	$code,
-						'sender'		=>	(isset($sender) && !empty($sender)) ? $sender : $this->config->item('cms_sender'),
-						'email_sender'	=>	(isset($email_sender) && !empty($email_sender)) ? $email_sender : $this->config->item('cms_email_sender'),
-						'email_reply'	=>	(isset($email_reply) && !empty($email_reply)) ? $email_reply : $this->config->item('cms_email_reply'),
+						'sender'		=>	(isset($sender) && !empty($sender)) ? $sender : $this->Configuration_model->getRow('sender')->option_value,
+						'email_sender'	=>	(isset($email_sender) && !empty($email_sender)) ? $email_sender : $this->Configuration_model->getRow('email_sender')->option_value,
+						'email_reply'	=>	(isset($email_reply) && !empty($email_reply)) ? $email_reply : $this->Configuration_model->getRow('email_reply')->option_value,
 						'subject'		=>	$subject,
 						'newsletter_id'	=>	$news,
 						'lists_opt'		=>	$lists,
@@ -364,11 +365,12 @@ class Campaigns extends MY_Controller
 					}
 				}
 
+				$this->load->model('Configuration_model');
 				$data = array(
 					'name'			=>	$name,
-					'sender'		=>	(isset($sender) && !empty($sender)) ? $sender : $this->config->item('cms_sender'),
-					'email_sender'	=>	(isset($email_sender) && !empty($email_sender)) ? $email_sender : $this->config->item('cms_email_sender'),
-					'email_reply'	=>	(isset($email_reply) && !empty($email_reply)) ? $email_reply : $this->config->item('cms_email_reply'),
+					'sender'		=>	(isset($sender) && !empty($sender)) ? $sender : $this->Configuration_model->getRow('sender')->option_value,
+					'email_sender'	=>	(isset($email_sender) && !empty($email_sender)) ? $email_sender : $this->Configuration_model->getRow('email_sender')->option_value,
+					'email_reply'	=>	(isset($email_reply) && !empty($email_reply)) ? $email_reply : $this->Configuration_model->getRow('email_reply')->option_value,
 					'subject'		=>	$subject,
 					'newsletter_id'	=>	$news,
 					'lists_opt'		=>	$lists,
@@ -475,7 +477,7 @@ class Campaigns extends MY_Controller
 
 		$this->load->model('Campaigns_model');
 
-		$fields = 'id, mailgun_id, name, sender, email_sender, email_reply, subject, newsletter_id, lists_opt, status, submit_at, created_at';
+		$fields = 'id, mailgun_id, name, sender, email_sender, email_reply, subject, newsletter_id, lists_opt, status, submit_at, created_at, send';
 		$row = $this->Campaigns_model->get(NULL, $fields, array('id' => (int)$id));
 
 		if ($row) {
@@ -483,7 +485,7 @@ class Campaigns extends MY_Controller
 		}
 
 		// Traemos la lista de newsletters activos
-		$news = $this->Campaigns_model->get('campaigns', 'name', array('id' => $row[0]->newsletter_id));
+		$news = $this->Campaigns_model->get('newsletters', 'name', array('id' => $row[0]->newsletter_id));
 		if (count($news) > 0) {
 			$this->template->set('_news', $news[0]);
 		}
@@ -510,6 +512,15 @@ class Campaigns extends MY_Controller
 		if (count($stats) > 0) {
 			$this->template->set('stats', $stats);
 		}
+
+		/* Ver quienes abrieron la campaña
+		$opens = $mailgun->get($this->config->item('mailgun_domain') . '/campaigns/' . $row[0]->mailgun_id . '/opens', array(
+			'groupby'	=>	'recipient',
+		))->http_response_body;
+
+		if (count($opens) > 0) {
+			$this->template->set('opens', $opens);
+		}*/
 
 		$this->load->helper('form');
 		$this->template->add_js('view', 'campaigns/script');
@@ -620,6 +631,12 @@ class Campaigns extends MY_Controller
 		}
 	}
 
+	/**
+	* Enviar campaña
+	*
+	* @access public
+	* @return snippet 		snippet
+	*/
 	public function send()
 	{
 		$id = $this->input->post('id');
@@ -643,34 +660,145 @@ class Campaigns extends MY_Controller
 				foreach ($lists as $list) {
 					// Obtener los miembros de cada lista a través de mailgun
 					$address = $this->Campaigns_model->get('mailing_lists', 'address', array('id' => $list->list_id));
-					$members = $mailgun->get('lists/' . $address[0]->address . '/members');
 
-					if ($members->http_response_body->total_count > 0) {
-						foreach ($members->http_response_body->items as $member) {
-							$respon = $mailgun->sendMessage($this->config->item('mailgun_domain'), array(
-								'from'    		=> 	$camp_data[0]->sender . ' <' . $camp_data[0]->email_sender . '>',
-								//'from'    		=> 	$camp_data[0]->email->sender,
-								'to'      		=> 	$member->name . ' <' . $member->address . '>',
-								//'to'      		=> 	$member->address,
-								//'cc'      	=> 	'baz@example.com',
-								//'bcc'     	=> 	'bar@example.com',
-								'subject' 		=>	$camp_data[0]->subject,
-								//'text'    	=> 'Testing some Mailgun awesomness!',
-								'html'    		=> 	$content,
-								'o:campaign'	=>	$camp_data[0]->mailgun_id,
-								'h:Reply-To'	=>	$camp_data[0]->email_reply,
-								'o:tracking'	=>	true,
-							))->http_response_body;
+					$total = $mailgun->get('lists/' . $address[0]->address . '/members', array(
+						'limit'			=>	1
+					));
 
-							if ($respon->message != 'Queued. Thank you') {
-								$check_email[] = $member->address;
+					$skip = 0;
+					while ($total->http_response_body->total_count > 0) {
+						$members = $mailgun->get('lists/' . $address[0]->address . '/members', array(
+							'limit'			=>	100,
+							'skip'			=>	$skip
+						));
+
+						if ($members->http_response_body->total_count > 0) {
+							foreach ($members->http_response_body->items as $member) {
+								$respon = $mailgun->sendMessage($this->config->item('mailgun_domain'), array(
+									'from'    		=> 	$camp_data[0]->sender . ' <' . $camp_data[0]->email_sender . '>',
+									'to'      		=> 	$member->name . ' <' . $member->address . '>',
+									//'cc'      	=> 	'baz@example.com',
+									//'bcc'     	=> 	'bar@example.com',
+									'subject' 		=>	$camp_data[0]->subject,
+									//'text'    	=> 'Testing some Mailgun awesomness!',
+									'html'    		=> 	$content,
+									'o:campaign'	=>	$camp_data[0]->mailgun_id,
+									'h:Reply-To'	=>	$camp_data[0]->email_reply,
+									'o:tracking'	=>	true,
+									//'o:testmode'	=>	true
+								))->http_response_body;
+
+								if ($respon->message != 'Queued. Thank you.') {
+									$check_email[] = $member->address;
+								}
 							}
 						}
+
+						$total->http_response_body->total_count -= 100;
+						$skip += 100;
 					}
 				}
+
+				// Actualizamos estado de envio de campaña
+				$this->Campaigns_model->edit(NULL, array('id' => $id), array('send' => 1));
 			}
 
 			echo json_encode($check_email);
+		}
+	}
+
+	/**
+	* Obtener reportes de delivered, opened, clicked
+	*
+	* @access public
+	* @param  $type 		str 		Tipo de reporte a generar
+	* @param  $id 			str 		Mailgun id de la campaña
+	*/
+	public function generateReport($type = 'delivered', $id = '')
+	{
+		if (empty($id)) {
+			show_error('¡Acceso denegado!');
+		}
+
+		if (!$this->user->has_permission('view_reports')) {
+			show_error('¡Acceso restringido!');
+		}
+
+		$mailgun = self::getMailgun();
+
+		/*
+		$queryString = array('event' => 'failed');
+
+		# Make the call to the client.
+		$result = $mailgun->get($this->config->item('mailgun_domain') . "/events", $queryString)->http_response_body;
+		echo '<pre>'; var_dump($result); exit;*/
+
+		$events = $mailgun->get($this->config->item('mailgun_domain') . '/campaigns/' . $id . '/events', array(
+			'event'		=>	'delivered',
+			'count'		=>	true
+		))->http_response_body;
+
+		$stats = $mailgun->get($this->config->item('mailgun_domain') . '/campaigns/' . $id . '/stats')->http_response_body;
+
+		$title = '';
+		$param = '';
+		$filename = '';
+		$total = 0;
+		$attr = '';
+		$value = '';
+
+		switch ($type) {
+			case 'opened':
+				$title = 'Lista de email que abrieron el correo';
+				$param = 'opens';
+				$filename = 'report-opened-' . date('Y-m-d');
+				$total = $stats->total->opened;
+				$attr = 'groupby';
+				$value = 'recipient';
+				break;
+
+			case 'clicked':
+				$title = 'Lista de email que hicieron click a enlaces del correo';
+				$param = 'clicks';
+				$filename = 'report-clicked-' . date('Y-m-d');
+				$total = $stats->total->clicked;
+				$attr = 'groupby';
+				$value = 'recipient';
+				break;
+
+			default:
+				$title = 'Lista de email que recibieron campaña';
+				$param = 'events';
+				$filename = 'report-delivered-' . date('Y-m-d');
+				$total = $events->count;
+				$attr = 'event';
+				$value = 'delivered';
+				break;
+		}
+
+		$page = 1;
+		$data = array();
+
+		while ($total > 0) {
+			$arr = $mailgun->get($this->config->item('mailgun_domain') . '/campaigns/' . $id . '/' . $param, array(
+				$attr		=>	$value,
+				'page'		=>	$page
+			))->http_response_body;
+
+			array_push($data, $arr);
+
+			$total -= 100;
+			$page++;
+		}
+
+		if ($data && count($data) > 0) {
+			$this->load->helper('functions');
+
+			$tags = array(
+				'Email'
+			);
+
+			convert_excel($title, $tags, $data, $filename);
 		}
 	}
 

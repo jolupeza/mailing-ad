@@ -35,6 +35,7 @@
 	$lang['cms_general_label_restore'] = 'Restore';
 	$lang['cms_general_label_delete_permanent'] = 'Permanently delete';
 	$lang['cms_general_label_no_found'] = 'No items were found.';
+	$lang['cms_general_label_change_status'] = 'Change status';
 
 	$lang['cms_general_label_featured_image'] = 'Featured image';
 	$lang['cms_general_label_assign_featured_image'] = 'Assign featured image';
@@ -95,6 +96,7 @@
 	$lang['cms_general_label_go'] = 'Go';
 	$lang['cms_general_title_links'] = 'Links';
 
+	$lang['cms_general_num_rows'] = 'Number of rows';
 	/***************************************** MENÚS *********************************************/
 	$lang['cms_general_menu_appearance'] = 'Appearance';
 	$lang['cms_general_menu_menus'] = 'Menus';

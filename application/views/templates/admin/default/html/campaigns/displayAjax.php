@@ -117,8 +117,9 @@
 					<?php echo ($item->status == 1) ? '<i class="fa fa-check"></i>' : '<i class="fa fa-times"></i>'; ?>
 				<?php endif; ?>
 				</td>
-				<td class="text-center"><?php echo date($this->config->item('cms_date_format'), strtotime($item->submit_at)); ?></td>
-				<td class="text-center"><?php echo date($this->config->item('cms_date_format'), strtotime($item->created_at)); ?></td>
+				<td class="text-center"><?php echo $item->submit_at; ?></td>
+				<td class="text-center"><?php echo $item->created_at; ?></td>
+				<!--td class="text-center"><?php //echo date($this->config->item('cms_date_format'), strtotime($item->created_at)); ?></td-->
 				<td class="text-center">
 				<?php if ($this->user->has_permission('send_campaigns') && $item->status == 1) : ?>
 					<a href="<?php echo base_url(); ?>admin/campaigns/sendCampaign/<?php echo $item->id; ?>" title="<?php echo $this->lang->line('cms_general_title_send_campaign'); ?>"><i class="fa fa-envelope-o fa-lg"></i></a>

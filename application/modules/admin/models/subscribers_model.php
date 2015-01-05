@@ -15,7 +15,7 @@ class Subscribers_Model extends CI_Model
 	* @param  $search		str 		Indicamos si obtenemos los resultados en base a un criterio de búsqueda.
 	* @return $res 			arr 		Devolvemos un array bidimensional, uno con los datos y otro con el número total de registros obtenidos por la consulta.
 	*/
-	public function getAll($status = 'all', $limit = null, $offset = 0, $sort_by, $sort_order, $list = 'all', $search = 'all')
+	public function getAll($status = 'all', $limit = null, $offset = 0, $sort_by, $sort_order, $list = 'all', $search = '')
 	{
 		$sort_order = ($sort_order == 'asc') ? 'asc' : 'desc';
 		$sort_columns = array('id', 'name', 'email', 'company', 'date_birth');
@@ -38,30 +38,44 @@ class Subscribers_Model extends CI_Model
 			$this->db->where_in('status', $status);
 		}
 
-		if ($search != 'all') {
-			$this->db->like('name', $search);
+		if (!empty($search) && $search != '' && count($search) > 0) {
+			foreach ($search as $key => $value) {
+				$this->db->like($key, $value);
+			}
 		}
+
 		$this->db->order_by($sort_by, $sort_order);
 
 		if ((int)$limit > 0) {
 			$result = $this->db->get('', (int)$limit, (int)$offset);
+		} else {
+			$result = $this->db->get('');
 		}
 
 		if ($result->num_rows() > 0) {
 			$res['data'] = $result->result();
 
-			$this->db->select('id');
+			$this->db->select('s.id');
+			$this->db->from($this->_table . ' s');
+
+			if ($list != 'all' && (int)$list > 0) {
+				$this->db->join('subscriber_lists sl', 's.id = sl.subscriber_id', 'left');
+				$this->db->where('list_id', $list);
+			}
+
 			if ($status == 'all') {
-				$this->db->where_in('status', array(0, 1));
+				$this->db->where_in('s.status', array(0, 1));
 			} else {
-				$this->db->where_in('status', $status);
+				$this->db->where_in('s.status', $status);
 			}
 
-			if ($search != 'all') {
-				$this->db->like('name', $search);
+			if (!empty($search) && $search != '' && count($search) > 0) {
+				foreach ($search as $key => $value) {
+					$this->db->like($key, $value);
+				}
 			}
 
-			$result = $this->db->get($this->_table);
+			$result = $this->db->get();
 			$res['num_rows'] = $result->num_rows();
 		}
 

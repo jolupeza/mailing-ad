@@ -41,8 +41,7 @@
 								echo form_label($this->lang->line('cms_general_mailgun_key'), 'mailgun_key', $attr);
 							?>
 							<div class="col-sm-5">
-								<?php $mailgun_key = (isset($_mailgun_key) && !empty($_mailgun_key) ? $_mailgun_key : ''); ?>
-					      		<?php echo form_input(array('class' => 'form-control', 'id' => 'mailgun_key', 'name' => 'mailgun_key', 'value' => $mailgun_key, 'required' => 'required')); ?>
+					      		<?php echo form_input(array('class' => 'form-control', 'id' => 'mailgun_key', 'name' => 'mailgun_key', 'value' => $_mailgun_key, 'required' => 'required')); ?>
 							</div>
 						</div>
 
@@ -55,8 +54,7 @@
 								echo form_label($this->lang->line('cms_general_mailgun_pubkey'), 'mailgun_pubkey', $attr);
 							?>
 							<div class="col-sm-5">
-								<?php $mailgun_pubkey = (isset($_mailgun_pubkey) && !empty($_mailgun_pubkey) ? $_mailgun_pubkey : ''); ?>
-					      		<?php echo form_input(array('class' => 'form-control', 'id' => 'mailgun_pubkey', 'name' => 'mailgun_pubkey', 'value' => $mailgun_pubkey, 'required' => 'required')); ?>
+					      		<?php echo form_input(array('class' => 'form-control', 'id' => 'mailgun_pubkey', 'name' => 'mailgun_pubkey', 'value' => $_mailgun_pubkey, 'required' => 'required')); ?>
 							</div>
 						</div>
 
@@ -69,8 +67,7 @@
 								echo form_label($this->lang->line('cms_general_mailgun_domain'), 'mailgun_domain', $attr);
 							?>
 							<div class="col-sm-5">
-								<?php $mailgun_domain = (isset($_mailgun_domain) && !empty($_mailgun_domain) ? $_mailgun_domain : ''); ?>
-					      		<?php echo form_input(array('class' => 'form-control', 'id' => 'mailgun_domain', 'name' => 'mailgun_domain', 'value' => $mailgun_domain, 'required' => 'required')); ?>
+					      		<?php echo form_input(array('class' => 'form-control', 'id' => 'mailgun_domain', 'name' => 'mailgun_domain', 'value' => $_mailgun_domain, 'required' => 'required')); ?>
 							</div>
 						</div>
 
@@ -83,8 +80,7 @@
 								echo form_label($this->lang->line('cms_general_mailgun_secret'), 'mailgun_secret', $attr);
 							?>
 							<div class="col-sm-5">
-								<?php $mailgun_secret = (isset($_mailgun_secret) && !empty($_mailgun_secret) ? $_mailgun_secret : ''); ?>
-					      		<?php echo form_input(array('class' => 'form-control', 'id' => 'mailgun_secret', 'name' => 'mailgun_secret', 'value' => $mailgun_secret, 'required' => 'required')); ?>
+					      		<?php echo form_input(array('class' => 'form-control', 'id' => 'mailgun_secret', 'name' => 'mailgun_secret', 'value' => $_mailgun_secret, 'required' => 'required')); ?>
 							</div>
 						</div>
 
@@ -97,8 +93,7 @@
 								echo form_label($this->lang->line('cms_general_label_sender'), 'sender', $attr);
 							?>
 							<div class="col-sm-5">
-								<?php $sender = (isset($_sender) && !empty($_sender) ? $_sender->option_value : ''); ?>
-					      		<?php echo form_input(array('class' => 'form-control', 'id' => 'sender', 'name' => 'sender', 'value' => $sender, 'required' => 'required')); ?>
+					      		<?php echo form_input(array('class' => 'form-control', 'id' => 'sender', 'name' => 'sender', 'value' => $_sender, 'required' => 'required')); ?>
 							</div>
 						</div>
 
@@ -111,8 +106,7 @@
 								echo form_label($this->lang->line('cms_general_label_email_sender'), 'email_sender', $attr);
 							?>
 							<div class="col-sm-5">
-								<?php $email_sender = (isset($_email_sender) && !empty($_email_sender) ? $_email_sender->option_value : ''); ?>
-					      		<?php echo form_input(array('type' => 'email', 'class' => 'form-control', 'id' => 'email_sender', 'name' => 'email_sender', 'value' => $email_sender, 'required' => 'required')); ?>
+					      		<?php echo form_input(array('type' => 'email', 'class' => 'form-control', 'id' => 'email_sender', 'name' => 'email_sender', 'value' => $_email_sender, 'required' => 'required')); ?>
 							</div>
 						</div>
 
@@ -125,8 +119,7 @@
 								echo form_label($this->lang->line('cms_general_label_email_reply'), 'email_reply', $attr);
 							?>
 							<div class="col-sm-5">
-								<?php $email_reply = (isset($_email_reply) && !empty($_email_reply) ? $_email_reply->option_value : ''); ?>
-					      		<?php echo form_input(array('type' => 'email', 'class' => 'form-control', 'id' => 'email_reply', 'name' => 'email_reply', 'value' => $email_reply, 'required' => 'required')); ?>
+					      		<?php echo form_input(array('type' => 'email', 'class' => 'form-control', 'id' => 'email_reply', 'name' => 'email_reply', 'value' => $_email_reply, 'required' => 'required')); ?>
 							</div>
 						</div>
 

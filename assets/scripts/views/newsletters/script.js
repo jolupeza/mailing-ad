@@ -9,6 +9,7 @@ var j = jQuery.noConflict();
       document_base_url: _root_,
       remove_script_host: false,
       relative_urls: false,
+      convert_urls: false,
       plugins: [
         "advlist autolink link image code lists charmap print preview hr anchor pagebreak",
          "searchreplace wordcount visualblocks visualchars insertdatetime media nonbreaking",
@@ -18,7 +19,7 @@ var j = jQuery.noConflict();
       toolbar2: "| responsivefilemanager | link unlink anchor | image media | forecolor backcolor  | print preview code ",
       image_advtab: true,
       external_filemanager_path: _root_ + "filemanager/",
-      filemanager_title:"Responsive Filemanager" ,
+      filemanager_title:"Responsive Filemanager",
       external_plugins: { "filemanager" : _root_ + "filemanager/plugin.min.js"}
     });
 

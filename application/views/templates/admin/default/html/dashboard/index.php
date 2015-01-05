@@ -10,7 +10,7 @@
 
 			<div class="panel-body">
 
-            	<h4>Primero debe crear clientes.</h4>
+            	<h4>Sistema de Mailing</h4>
 
 			</div><!-- end panel-body -->
 		</div><!-- end panel -->

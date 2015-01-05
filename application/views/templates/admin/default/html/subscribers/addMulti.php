@@ -13,6 +13,17 @@
 				    </div>
 				    <?php endif; ?>
 
+				    <?php if (isset($errorEmail) && count($errorEmail)) : ?>
+
+				    <h4 class="text-danger">Los siguientes correos no se pudieron agregar por no ser direcciones de correo válidas.</h4>
+				    <ul>
+				    	<?php foreach ($errorEmail as $ee) : ?>
+				    	<li><?php echo $ee; ?></li>
+				    	<?php endforeach; ?>
+				    </ul>
+
+					<?php endif; ?>
+
 				</div><!-- end panel-heading -->
 
 			</div><!-- end panel -->

@@ -35,28 +35,26 @@
 					<?php echo form_open('', array('id' => 'frm_setting_media'), array('token' => $_token)); ?>
 						<div class="form-inline">
 							<div class="legend"><?php echo $this->lang->line('cms_general_title_image_thumbnails'); ?></div>
-							<?php $thumb_s_w = (isset($_thumb_s_w) && !empty($_thumb_s_w) ? $_thumb_s_w->option_value : ''); ?>
-							<?php $thumb_s_h = (isset($_thumb_s_h) && !empty($_thumb_s_h) ? $_thumb_s_h->option_value : ''); ?>
 							<?php
 								$datos = array(
 									'name'		=>	'thumb_width',
 									'id'		=>	'thumb_width',
 									'type'		=>	'number',
-									'value'		=>	$thumb_s_w,
+									'value'		=>	$_thumb_s_w,
 									'maxlength'	=>	'4'
 								);
 								$datos2 = array(
 									'name'		=>	'thumb_height',
 									'id'		=>	'thumb_height',
 									'type'		=>	'number',
-									'value'		=>	$thumb_s_h,
+									'value'		=>	$_thumb_s_h,
 									'maxlength'	=>	'4'
 								);
 							?>
 							<div class="area-input"><?php echo $this->lang->line('cms_general_label_width'); ?> <?php echo form_input($datos); ?> <?php echo $this->lang->line('cms_general_label_height'); ?> <?php echo form_input($datos2); ?>
 								<div class="checkbox">
 				    				<label>
-				    					<?php $checked = ($_thumb_crop->option_value == 1) ? 'checked="checked"' : ''; ?>
+				    					<?php $checked = ($_thumb_crop == 1) ? 'checked="checked"' : ''; ?>
 				      					<input name="crop" value="1" type="checkbox" <?php echo $checked; ?>><?php echo $this->lang->line('cms_general_label_message_resize'); ?>
 				    				</label><!-- end label -->
 				  				</div><!-- end checkbox -->
@@ -65,21 +63,19 @@
 
 						<div class="form-inline">
 							<div class="legend"><?php echo $this->lang->line('cms_general_title_size_medio'); ?></div>
-							<?php $med_s_w = (isset($_med_s_w) && !empty($_med_s_w)) ? $_med_s_w->option_value : ''; ?>
-							<?php $med_s_h = (isset($_med_s_h) && !empty($_med_s_h)) ? $_med_s_h->option_value : ''; ?>
 							<?php
 								$datos = array(
 									'name'		=>	'medio_width',
 									'id'		=>	'medio_width',
 									'type'		=>	'number',
-									'value'		=>	$med_s_w,
+									'value'		=>	$_med_s_w,
 									'maxlength'	=>	'4'
 								);
 								$datos2 = array(
 									'name'		=>	'medio_height',
 									'id'		=>	'medio_height',
 									'type'		=>	'number',
-									'value'		=>	$med_s_h,
+									'value'		=>	$_med_s_h,
 									'maxlength'	=>	'4'
 								);
 							?>
@@ -89,21 +85,19 @@
 
 						<div class="form-inline">
 							<div class="legend"><?php echo $this->lang->line('cms_general_title_size_large'); ?></div>
-							<?php $larg_s_w = (isset($_larg_s_w) && !empty($_larg_s_w)) ? $_larg_s_w->option_value : ''; ?>
-							<?php $larg_s_h = (isset($_larg_s_h) && !empty($_larg_s_h)) ? $_larg_s_h->option_value : ''; ?>
 							<?php
 								$datos = array(
 									'name'		=>	'large_width',
 									'id'		=>	'large_width',
 									'type'		=>	'number',
-									'value'		=>	$larg_s_w,
+									'value'		=>	$_larg_s_w,
 									'maxlength'	=>	'4'
 								);
 								$datos2 = array(
 									'name'		=>	'large_height',
 									'id'		=>	'large_height',
 									'type'		=>	'number',
-									'value'		=>	$larg_s_h,
+									'value'		=>	$_larg_s_h,
 									'maxlength'	=>	'4'
 								);
 							?>

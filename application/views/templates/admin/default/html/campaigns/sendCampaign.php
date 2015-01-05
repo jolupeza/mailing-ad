@@ -102,8 +102,41 @@
 							</ul>
 
 						<?php if ($_camp->status == 1) : ?>
-							<?php echo form_button(array('id' => 'send_camp', 'class' => 'btn btn-cms', 'type' => 'button', 'value' => $this->lang->line('cms_general_label_add'), 'content' => $this->lang->line('cms_general_label_send') . '<i class="fa fa-send"></i>', 'data-id' => $_camp->id)); ?>
+							<?php
+								$attr = array(
+									'id' 		=> 'send_camp',
+									'class' 	=> 'btn btn-cms',
+									'type' 		=> 'button',
+									'value' 	=> $this->lang->line('cms_general_label_add'),
+									'content' 	=> $this->lang->line('cms_general_label_send') . '<i class="fa fa-send"></i>',
+									'data-id'	=>	$_camp->id
+								);
+
+								if ($_camp->send == 1) {
+									$attr['disabled'] = 'disabled';
+								}
+							?>
+							<?php echo form_button($attr); ?>
+							<?php //echo form_button(array('id' => 'send_camp', 'class' => 'btn btn-cms', 'type' => 'button', 'value' => $this->lang->line('cms_general_label_add'), 'content' => $this->lang->line('cms_general_label_send') . '<i class="fa fa-send"></i>', 'data-id' => $_camp->id)); ?>
 						<?php endif; ?>
+
+					<?php if ($this->user->has_permission('view_reports')) : ?>
+						<?php if ($_camp->send == 1) : ?>
+							<h4>Reportes</h4>
+							<?php if ($stats->total->delivered > 0) : ?>
+							<a href="<?php echo base_url(); ?>admin/campaigns/generateReport/delivered/<?php echo $_camp->mailgun_id; ?>" class="btn btn-primary btn-lg btn-block">Delivered</a>
+							<?php endif; ?>
+
+							<?php if ($stats->total->opened > 0) : ?>
+							<a href="<?php echo base_url(); ?>admin/campaigns/generateReport/opened/<?php echo $_camp->mailgun_id; ?>" class="btn btn-primary btn-lg btn-block">Opens</a>
+							<?php endif; ?>
+
+							<?php if ($stats->total->clicked > 0) : ?>
+							<a href="<?php echo base_url(); ?>admin/campaigns/generateReport/clicked/<?php echo $_camp->mailgun_id; ?>" class="btn btn-primary btn-lg btn-block">Clicks</a>
+							<?php endif; ?>
+						<?php endif; ?>
+					<?php endif; ?>
+
 						</div><!-- end col-sm-3 -->
 
 				  	</div><!-- end row -->
